@@ -139,8 +139,10 @@ function plots_Spectrogram_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global xs fs;
+% save('Metody_eksperymentalne\GUI_Signals\spectre_tmp.mat','xs','fs');
 figure;
 spectrogram(xs,[],[],[],fs);
+% GUI_Spectrogram;
 
 % --------------------------------------------------------------------
 function plots_PSD_Callback(hObject, eventdata, handles)
@@ -148,6 +150,7 @@ function plots_PSD_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global xs fs;
+% save('Metody_eksperymentalne\GUI_Signals\psd_tmp.mat','xs','fs');
 figure;
 pwelch(xs,[],[],[],fs);
 
