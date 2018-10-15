@@ -22,7 +22,7 @@ function varargout = GUI_Signals(varargin)
 
 % Edit the above text to modify the response to help GUI_Signals
 
-% Last Modified by GUIDE v2.5 13-Oct-2018 17:48:49
+% Last Modified by GUIDE v2.5 15-Oct-2018 13:55:22
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,7 +79,7 @@ function pushbutton1_generate_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % sygna³
-global type fs xs;
+global type fs xs xscale yscale fw yw;
 switch type
     case 1 % MAT
         file = uigetfile({'*.mat','Pliki MAT (*.mat)'},'Wczytaj dane');
@@ -117,8 +117,19 @@ else
     y = y/(n/2);
     df = 1/5;
     f = 0:df:fs/2;
+    
+    % kopia globalna
+    fw = f;
+    yw = y;
     axes(handles.axes2_widmo);
-    plot(f,y);
+    % typ wykresu
+    if xscale == 1 && yscale == 1 % lin-lin
+        plot(f,y);
+    elseif xscale == 2 && yscale == 1 % log-lin
+        semilogx(f,y);
+    elseif xscale == 1 && yscale == 2 % lin-log
+        semilogy(f,y);
+    end
     zoom on;
     xlabel('Czêstotliwoœæ [Hz]');
     ylabel('Amplituda');
@@ -139,10 +150,10 @@ function plots_Spectrogram_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global xs fs;
-% save('Metody_eksperymentalne\GUI_Signals\spectre_tmp.mat','xs','fs');
-figure;
-spectrogram(xs,[],[],[],fs);
-% GUI_Spectrogram;
+save('Metody_eksperymentalne\GUI_Signals\spectre_tmp.mat','xs','fs');
+% figure;
+% spectrogram(xs,[],[],[],fs);
+GUI_Spectrogram;
 
 % --------------------------------------------------------------------
 function plots_PSD_Callback(hObject, eventdata, handles)
@@ -312,3 +323,65 @@ function uibuttongroup1_filetype_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 global type;
 type = 1;
+
+
+% --- Executes during object creation, after setting all properties.
+function uibuttongroup2_widmo_x_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to uibuttongroup2_widmo_x (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+global xscale;
+xscale = 1;
+
+
+% --- Executes during object creation, after setting all properties.
+function uibuttongroup3_widmo_y_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to uibuttongroup3_widmo_y (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+global yscale;
+yscale = 1;
+
+
+% --- Executes when selected object is changed in uibuttongroup2_widmo_x.
+function uibuttongroup2_widmo_x_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup2_widmo_x 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global xscale;
+switch eventdata.NewValue
+    case handles.radiobutton4_x_lin % liniowa
+        xscale = 1;
+    case handles.radiobutton5_x_log % logarytmiczna
+        xscale = 2;
+end
+
+
+% --- Executes on button press in pushbutton4_redraw.
+function pushbutton4_redraw_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton4_redraw (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global xscale yscale fw yw;
+axes(handles.axes2_widmo);
+cla(handles.axes2_widmo,'reset');
+% typ wykresu
+if xscale == 1 && yscale == 1 % lin-lin
+    plot(fw,yw);
+elseif xscale == 2 && yscale == 1 % log-lin
+    semilogx(fw,yw);
+elseif xscale == 1 && yscale == 2 % lin-log
+    semilogy(fw,yw);
+end
+% --- Executes when selected object is changed in uibuttongroup3_widmo_y.
+function uibuttongroup3_widmo_y_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup3_widmo_y 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global yscale;
+switch eventdata.NewValue
+    case handles.radiobutton6_y_lin % liniowa
+        yscale = 1;
+    case handles.radiobutton7_y_log % logarytmiczna
+        yscale = 2;
+end

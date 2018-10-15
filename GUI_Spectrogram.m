@@ -127,6 +127,8 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 global slider_min slider_max;
+slider_min = 16;
+slider_max = 128;
 set(hObject,'Min',slider_min);
 set(hObject,'Max',slider_max);
 set(hObject,'Value',slider_min);
@@ -155,6 +157,8 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 global slider_min slider_max;
+slider_min = 16;
+slider_max = 128;
 set(hObject,'Min',slider_min);
 set(hObject,'Max',slider_max);
 set(hObject,'Value',slider_min);
