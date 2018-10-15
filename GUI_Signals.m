@@ -22,7 +22,7 @@ function varargout = GUI_Signals(varargin)
 
 % Edit the above text to modify the response to help GUI_Signals
 
-% Last Modified by GUIDE v2.5 15-Oct-2018 13:55:22
+% Last Modified by GUIDE v2.5 15-Oct-2018 20:46:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,64 +79,69 @@ function pushbutton1_generate_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % sygna³
-global type tg xg;
+global type tg xg fg fw yw x_scale;
 switch type
     case 1 % MAT
         file = uigetfile({'*.mat','Pliki MAT (*.mat)'},'Wczytaj dane');
         load(file);
         tg = t;
         xg = x;
+        cla(handles.axes1_tv);
+        cla(handles.axes2_widmo);
         
     case 2 % CSV
         file = uigetfile({'*.csv','Pliki CSV (*.csv)'},'Wczytaj dane');
         [ tg, xg ] = importfile(file,';');
+        cla(handles.axes1_tv);
+        cla(handles.axes2_widmo);
         
     case 3 % TXT
         file = uigetfile({'*.txt','Pliki TXT (*.txt)'},'Wczytaj dane');
         [ tg, xg ] = importfile(file,'\t');
+        cla(handles.axes1_tv);
+        cla(handles.axes2_widmo);
 end
 
 if isequal(file,0)
     return;
 else
-%     fs = 2000; % 2 kHz
-%     ts = t;
-%     xs = x;
-% 
-%     % przebieg czasowy
-%     axes(handles.axes1_tv);
-%     plot(ts,xs);
-%     zoom on;
-%     xlabel('Czas [s]');
-%     ylabel('Amplituda');
-%     set(gca,'fontsize',8);
-% 
-%     % widmo
-%     n = length(x);
-%     y = fft(x);
-%     y = y(1:n/2+1);
-%     y = abs(y);
-%     y = y/(n/2);
-%     df = 1/5;
-%     f = 0:df:fs/2;
-%     
-%     % kopia globalna
-%     fw = f;
-%     yw = y;
-%     axes(handles.axes2_widmo);
-%     % typ wykresu
-%     if x_scale == 1 && y_scale == 1 % lin-lin
-%         plot(f,y);
-%     elseif x_scale == 2 && y_scale == 1 % log-lin
-%         semilogx(f,y);
-%     elseif x_scale == 1 && y_scale == 2 % lin-log
-%         semilogy(f,y);
-%     end
-%     zoom on;
-%     xlabel('Czêstotliwoœæ [Hz]');
-%     ylabel('Amplituda');
-%     set(gca,'fontsize',8);
-%     linkaxes([ handles.axes1_tv, handles.axes2_widmo ],'y');
+    fs = 2000; % 2 kHz
+    fg = fs;
+    ts = tg;
+    xs = xg;
+
+    % przebieg czasowy
+    axes(handles.axes1_tv);
+    plot(ts,xs);
+    zoom on;
+    xlabel('Czas [s]');
+    ylabel('Amplituda');
+    set(gca,'fontsize',8);
+
+    % widmo
+    n = length(xg);
+    y = fft(xg);
+    y = y(1:n/2+1);
+    y = abs(y);
+    y = y/(n/2);
+    df = 1/5;
+    f = 0:df:fs/2;
+    
+    % kopia globalna
+    fw = f;
+    yw = y;
+    axes(handles.axes2_widmo);
+    % typ wykresu
+    if x_scale == 1 % lin
+        plot(f,y);
+    else % log
+        semilogy(f,y);
+    end
+    zoom on;
+    xlabel('Czêstotliwoœæ [Hz]');
+    ylabel('Amplituda');
+    set(gca,'fontsize',8);
+    linkaxes([ handles.axes1_tv, handles.axes2_widmo ],'y');
 
 end
 % --------------------------------------------------------------------
@@ -151,8 +156,8 @@ function plots_Spectrogram_Callback(hObject, eventdata, handles)
 % hObject    handle to plots_Spectrogram (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global xs fs;
-save('Metody_eksperymentalne\GUI_Signals\spectre_tmp.mat','xs','fs');
+global xg fs;
+save('Metody_eksperymentalne\GUI_Signals\spectre_tmp.mat','xg','fs');
 % figure;
 % spectrogram(xs,[],[],[],fs);
 GUI_Spectrogram;
@@ -162,10 +167,11 @@ function plots_PSD_Callback(hObject, eventdata, handles)
 % hObject    handle to plots_PSD (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global xs fs;
-% save('Metody_eksperymentalne\GUI_Signals\psd_tmp.mat','xs','fs');
-figure;
-pwelch(xs,[],[],[],fs);
+global xg fs;
+save('Metody_eksperymentalne\GUI_Signals\psd_tmp.mat','xg','fs');
+% figure;
+% pwelch(xs,[],[],[],fs);
+GUI_PSD;
 
 
 % --------------------------------------------------------------------
@@ -319,26 +325,17 @@ type = 1;
 
 
 % --- Executes during object creation, after setting all properties.
-function uibuttongroup2_widmo_x_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to uibuttongroup2_widmo_x (see GCBO)
+function uibuttongroup2_widmo_scale_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to uibuttongroup2_widmo_scale (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 global x_scale;
 x_scale = 1;
 
 
-% --- Executes during object creation, after setting all properties.
-function uibuttongroup3_widmo_y_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to uibuttongroup3_widmo_y (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-global y_scale;
-y_scale = 1;
-
-
-% --- Executes when selected object is changed in uibuttongroup2_widmo_x.
-function uibuttongroup2_widmo_x_SelectionChangedFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in uibuttongroup2_widmo_x 
+% --- Executes when selected object is changed in uibuttongroup2_widmo_scale.
+function uibuttongroup2_widmo_scale_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in uibuttongroup2_widmo_scale 
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global x_scale;
@@ -350,62 +347,45 @@ switch eventdata.NewValue
 end
 
 
-% --- Executes on button press in pushbutton4_redraw.
-function pushbutton4_redraw_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton4_redraw (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global tg xg ts xs fs x_scale y_scale;
-fs = 2000; % 2 kHz
-t = tg;
-x = xg;
-ts = t;
-xs = x;
-
-% przebieg czasowy
-axes(handles.axes1_tv);
-plot(t,x);
-zoom on;
-xlabel('Czas [s]');
-ylabel('Amplituda');
-set(gca,'fontsize',8);
-
-% widmo
-n = length(x);
-y = fft(x);
-y = y(1:n/2+1);
-y = abs(y);
-y = y/(n/2);
-df = 1/5;
-f = 0:df:fs/2;
-
-% kopia globalna
-% fw = f;
-% yw = y;
+% --- Executes on button press in radiobutton5_x_log.
+function radiobutton5_x_log_Callback(hObject, eventdata, handles)
+global fw yw;
+cla(handles.axes2_widmo);
 axes(handles.axes2_widmo);
-% typ wykresu
-if x_scale == 1 && y_scale == 1 % lin-lin
-    plot(f,y);
-elseif x_scale == 2 && y_scale == 1 % log-lin
-    semilogx(f,y);
-elseif x_scale == 1 && y_scale == 2 % lin-log
-    semilogy(f,y);
-end
-zoom on;
-xlabel('Czêstotliwoœæ [Hz]');
-ylabel('Amplituda');
-set(gca,'fontsize',8);
-linkaxes([ handles.axes1_tv, handles.axes2_widmo ],'y');
+semilogy(fw,yw);
 
-% --- Executes when selected object is changed in uibuttongroup3_widmo_y.
-function uibuttongroup3_widmo_y_SelectionChangedFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in uibuttongroup3_widmo_y 
+% --- Executes on button press in radiobutton4_x_lin.
+function radiobutton4_x_lin_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton4_x_lin (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global y_scale;
-switch eventdata.NewValue
-    case handles.radiobutton6_y_lin % liniowa
-        y_scale = 1;
-    case handles.radiobutton7_y_log % logarytmiczna
-        y_scale = 2;
-end
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton4_x_lin
+global fw yw;
+cla(handles.axes2_widmo);
+axes(handles.axes2_widmo);
+plot(fw,yw);
+
+
+% --------------------------------------------------------------------
+function plots_period_Callback(hObject, eventdata, handles)
+% hObject    handle to plots_period (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global xg;
+save('Metody_eksperymentalne\GUI_Signals\period_tmp.mat','xg');
+GUI_Period;
+% figure;
+% periodogram(xs);
+
+
+% --- Executes on button press in pushbutton5_filter.
+function pushbutton5_filter_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5_filter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global xg fw yw;
+assignin('base','xgt',xg);
+assignin('base','fwt',fw);
+assignin('base','ywt',yw);
+GUI_Filter;

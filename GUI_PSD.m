@@ -1,35 +1,35 @@
-function varargout = GUI_Spectrogram(varargin)
-% GUI_SPECTROGRAM MATLAB code for GUI_Spectrogram.fig
-%      GUI_SPECTROGRAM, by itself, creates a new GUI_SPECTROGRAM or raises the existing
+function varargout = GUI_PSD(varargin)
+% GUI_PSD MATLAB code for GUI_PSD.fig
+%      GUI_PSD, by itself, creates a new GUI_PSD or raises the existing
 %      singleton*.
 %
-%      H = GUI_SPECTROGRAM returns the handle to a new GUI_SPECTROGRAM or the handle to
+%      H = GUI_PSD returns the handle to a new GUI_PSD or the handle to
 %      the existing singleton*.
 %
-%      GUI_SPECTROGRAM('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in GUI_SPECTROGRAM.M with the given input arguments.
+%      GUI_PSD('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in GUI_PSD.M with the given input arguments.
 %
-%      GUI_SPECTROGRAM('Property','Value',...) creates a new GUI_SPECTROGRAM or raises the
+%      GUI_PSD('Property','Value',...) creates a new GUI_PSD or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before GUI_Spectrogram_OpeningFcn gets called.  An
+%      applied to the GUI before GUI_PSD_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to GUI_Spectrogram_OpeningFcn via varargin.
+%      stop.  All inputs are passed to GUI_PSD_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help GUI_Spectrogram
+% Edit the above text to modify the response to help GUI_PSD
 
-% Last Modified by GUIDE v2.5 15-Oct-2018 19:13:04
+% Last Modified by GUIDE v2.5 15-Oct-2018 18:59:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @GUI_Spectrogram_OpeningFcn, ...
-                   'gui_OutputFcn',  @GUI_Spectrogram_OutputFcn, ...
+                   'gui_OpeningFcn', @GUI_PSD_OpeningFcn, ...
+                   'gui_OutputFcn',  @GUI_PSD_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,28 +44,28 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before GUI_Spectrogram is made visible.
-function GUI_Spectrogram_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before GUI_PSD is made visible.
+function GUI_PSD_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to GUI_Spectrogram (see VARARGIN)
+% varargin   command line arguments to GUI_PSD (see VARARGIN)
 
-% Choose default command line output for GUI_Spectrogram
+% Choose default command line output for GUI_PSD
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes GUI_Spectrogram wait for user response (see UIRESUME)
+% UIWAIT makes GUI_PSD wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-load('Metody_eksperymentalne\GUI_Signals\spectre_tmp.mat');
-axes(handles.axes1_spectre);
-spectrogram(xg,[],[],[],fs);
+load('Metody_eksperymentalne\GUI_Signals\psd_tmp.mat');
+axes(handles.axes1_psd);
+pwelch(xg,[],[],[],fs);
 
 % --- Outputs from this function are returned to the command line.
-function varargout = GUI_Spectrogram_OutputFcn(hObject, eventdata, handles) 
+function varargout = GUI_PSD_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -108,8 +108,8 @@ global v_window v_overlap v_nfft xg fs;
 v = get(hObject,'Value');
 v_window = v;
 set(handles.edit1_window,'string',num2str(v));
-axes(handles.axes1_spectre);
-spectrogram(xg,v,v_overlap,v_nfft,fs);
+axes(handles.axes1_psd);
+pwelch(xg,v,v_overlap,v_nfft,fs);
 
 
 % --- Executes on slider movement.
@@ -124,8 +124,8 @@ global v_noverlap v_window v_nfft fs xg;
 v = get(hObject,'Value');
 v_noverlap = v;
 set(handles.edit2_noverlap,'string',num2str(v));
-axes(handles.axes1_spectre);
-spectrogram(xg,v_window,v,v_nfft,fs);
+axes(handles.axes1_psd);
+pwelch(xg,v_window,v,v_nfft,fs);
 
 % --- Executes during object creation, after setting all properties.
 function slider2_noverlap_CreateFcn(hObject, eventdata, handles)
@@ -160,8 +160,8 @@ global v_nfft v_window v_noverlap fs xg;
 v = get(hObject,'Value');
 v_nfft = v;
 set(handles.edit3_nfft,'string',num2str(v));
-axes(handles.axes1_spectre);
-spectrogram(xg,v_window,v_noverlap,v,fs);
+axes(handles.axes1_psd);
+pwelch(xg,v_window,v_noverlap,v,fs);
 
 % --- Executes during object creation, after setting all properties.
 function slider3_nfft_CreateFcn(hObject, eventdata, handles)
@@ -259,20 +259,20 @@ function pushbutton1_close_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % msgbox('Zamykamy');
-delete('Metody_eksperymentalne\GUI_Signals\spectre_tmp.mat');
+delete('Metody_eksperymentalne\GUI_Signals\psd_tmp.mat');
 delete(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
-function axes1_spectre_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to axes1_spectre (see GCBO)
+function axes1_psd_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes1_psd (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: place code in OpeningFcn to populate axes1_spectre
+% Hint: place code in OpeningFcn to populate axes1_psd
 global xg fs;
 axes(hObject);
-spectrogram(xg,[],[],[],fs);
+pwelch(xg,[],[],[],fs);
 
 
 % --- Executes on button press in pushbutton2_redraw.
@@ -281,9 +281,9 @@ function pushbutton2_redraw_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global xg fs v_window v_noverlap v_nfft;
-cla(handles.axes1_spectre,'reset');
-axes(handles.axes1_spectre);
-spectrogram(xg,v_window,v_noverlap,v_nfft,fs);
+cla(handles.axes1_psd,'reset');
+axes(handles.axes1_psd);
+pwelch(xg,v_window,v_noverlap,v_nfft,fs);
 
 
 % --- Executes on button press in pushbutton1_null.
@@ -292,5 +292,5 @@ function pushbutton1_null_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global xg fs;
-axes(handles.axes1_spectre);
-spectrogram(xg,[],[],[],fs);
+axes(handles.axes1_psd);
+pwelch(xg,[],[],[],fs);
