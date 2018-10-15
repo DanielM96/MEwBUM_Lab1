@@ -22,7 +22,7 @@ function varargout = GUI_Spectrogram(varargin)
 
 % Edit the above text to modify the response to help GUI_Spectrogram
 
-% Last Modified by GUIDE v2.5 14-Oct-2018 10:48:18
+% Last Modified by GUIDE v2.5 15-Oct-2018 14:43:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -72,18 +72,6 @@ function varargout = GUI_Spectrogram_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-
-% --- Executes on slider movement.
-function slider1_window_Callback(hObject, eventdata, handles)
-% hObject    handle to slider1_window (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-v = get(hObject,'Value');
-set(handles.edit1_window,'string',num2str(v));
-
 % --- Executes during object creation, after setting all properties.
 function slider1_window_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider1_window (see GCBO)
@@ -95,14 +83,30 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-global slider_min slider_max;
-slider_min = 16;
+global slider_min slider_max v_window;
+slider_min = 32;
 slider_max = 128;
+v_window = slider_min;
 
 set(hObject,'Min',slider_min);
 set(hObject,'Max',slider_max);
 set(hObject,'Value',slider_min);
-set(hObject,'SliderStep',[ 1/7 0.5 ]);
+set(hObject,'SliderStep',[ 1/6 0.5 ]);
+
+
+% --- Executes on slider movement.
+function slider1_window_Callback(hObject, eventdata, handles)
+% hObject    handle to slider1_window (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global v_window;
+v = get(hObject,'Value');
+v_window = v;
+set(handles.edit1_window,'string',num2str(v));
+
 
 % --- Executes on slider movement.
 function slider2_noverlap_Callback(hObject, eventdata, handles)
@@ -112,7 +116,9 @@ function slider2_noverlap_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global v_noverlap;
 v = get(hObject,'Value');
+v_noverlap = v;
 set(handles.edit2_noverlap,'string',num2str(v));
 
 % --- Executes during object creation, after setting all properties.
@@ -126,13 +132,15 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-global slider_min slider_max;
+global slider_min slider_max v_noverlap;
 slider_min = 16;
-slider_max = 128;
+slider_max = 112;
+v_noverlap = slider_min;
+
 set(hObject,'Min',slider_min);
 set(hObject,'Max',slider_max);
 set(hObject,'Value',slider_min);
-set(hObject,'SliderStep',[ 1/7 0.5 ]);
+set(hObject,'SliderStep',[ 1/6 0.5 ]);
 
 % --- Executes on slider movement.
 function slider3_nfft_Callback(hObject, eventdata, handles)
@@ -142,7 +150,9 @@ function slider3_nfft_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global v_nfft;
 v = get(hObject,'Value');
+v_nfft = v;
 set(handles.edit3_nfft,'string',num2str(v));
 
 % --- Executes during object creation, after setting all properties.
@@ -156,13 +166,15 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-global slider_min slider_max;
-slider_min = 16;
+global slider_min slider_max v_nfft;
+slider_min = 32;
 slider_max = 128;
+v_nfft = slider_min;
+
 set(hObject,'Min',slider_min);
 set(hObject,'Max',slider_max);
 set(hObject,'Value',slider_min);
-set(hObject,'SliderStep',[ 1/7 0.5 ]);
+set(hObject,'SliderStep',[ 1/6 0.5 ]);
 
 
 function edit1_window_Callback(hObject, eventdata, handles)
@@ -251,4 +263,16 @@ function axes1_spectre_CreateFcn(hObject, eventdata, handles)
 
 % Hint: place code in OpeningFcn to populate axes1_spectre
 global xs fs;
+axes(hObject);
 spectrogram(xs,[],[],[],fs);
+
+
+% --- Executes on button press in pushbutton2_redraw.
+function pushbutton2_redraw_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2_redraw (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global xs fs v_window v_noverlap v_nfft;
+cla(handles.axes1_spectre,'reset');
+axes(handles.axes1_spectre);
+spectrogram(xs,v_window,v_noverlap,v_nfft,fs);

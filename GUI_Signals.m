@@ -79,62 +79,64 @@ function pushbutton1_generate_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % sygna³
-global type fs xs xscale yscale fw yw;
+global type tg xg;
 switch type
     case 1 % MAT
         file = uigetfile({'*.mat','Pliki MAT (*.mat)'},'Wczytaj dane');
         load(file);
+        tg = t;
+        xg = x;
         
     case 2 % CSV
         file = uigetfile({'*.csv','Pliki CSV (*.csv)'},'Wczytaj dane');
-        [ t, x ] = importfile(file,';');
+        [ tg, xg ] = importfile(file,';');
         
     case 3 % TXT
         file = uigetfile({'*.txt','Pliki TXT (*.txt)'},'Wczytaj dane');
-        [ t, x ] = importfile(file,'\t');
+        [ tg, xg ] = importfile(file,'\t');
 end
 
 if isequal(file,0)
     return;
 else
-    fs = 2000; % 2 kHz
-    ts = t;
-    xs = x;
-
-    % przebieg czasowy
-    axes(handles.axes1_tv);
-    plot(ts,xs);
-    zoom on;
-    xlabel('Czas [s]');
-    ylabel('Amplituda');
-    set(gca,'fontsize',8);
-
-    % widmo
-    n = length(x);
-    y = fft(x);
-    y = y(1:n/2+1);
-    y = abs(y);
-    y = y/(n/2);
-    df = 1/5;
-    f = 0:df:fs/2;
-    
-    % kopia globalna
-    fw = f;
-    yw = y;
-    axes(handles.axes2_widmo);
-    % typ wykresu
-    if xscale == 1 && yscale == 1 % lin-lin
-        plot(f,y);
-    elseif xscale == 2 && yscale == 1 % log-lin
-        semilogx(f,y);
-    elseif xscale == 1 && yscale == 2 % lin-log
-        semilogy(f,y);
-    end
-    zoom on;
-    xlabel('Czêstotliwoœæ [Hz]');
-    ylabel('Amplituda');
-    set(gca,'fontsize',8);
-    linkaxes([ handles.axes1_tv, handles.axes2_widmo ],'y');
+%     fs = 2000; % 2 kHz
+%     ts = t;
+%     xs = x;
+% 
+%     % przebieg czasowy
+%     axes(handles.axes1_tv);
+%     plot(ts,xs);
+%     zoom on;
+%     xlabel('Czas [s]');
+%     ylabel('Amplituda');
+%     set(gca,'fontsize',8);
+% 
+%     % widmo
+%     n = length(x);
+%     y = fft(x);
+%     y = y(1:n/2+1);
+%     y = abs(y);
+%     y = y/(n/2);
+%     df = 1/5;
+%     f = 0:df:fs/2;
+%     
+%     % kopia globalna
+%     fw = f;
+%     yw = y;
+%     axes(handles.axes2_widmo);
+%     % typ wykresu
+%     if x_scale == 1 && y_scale == 1 % lin-lin
+%         plot(f,y);
+%     elseif x_scale == 2 && y_scale == 1 % log-lin
+%         semilogx(f,y);
+%     elseif x_scale == 1 && y_scale == 2 % lin-log
+%         semilogy(f,y);
+%     end
+%     zoom on;
+%     xlabel('Czêstotliwoœæ [Hz]');
+%     ylabel('Amplituda');
+%     set(gca,'fontsize',8);
+%     linkaxes([ handles.axes1_tv, handles.axes2_widmo ],'y');
 
 end
 % --------------------------------------------------------------------
@@ -307,15 +309,6 @@ t = cell2mat(raw(:, 1));
 x = cell2mat(raw(:, 2));
 
 
-% --- Executes on button press in pushbutton3_clear.
-function pushbutton3_clear_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton3_clear (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-cla(handles.axes1_tv,'reset');
-cla(handles.axes2_widmo,'reset');
-
-
 % --- Executes during object creation, after setting all properties.
 function uibuttongroup1_filetype_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to uibuttongroup1_filetype (see GCBO)
@@ -330,8 +323,8 @@ function uibuttongroup2_widmo_x_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to uibuttongroup2_widmo_x (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-global xscale;
-xscale = 1;
+global x_scale;
+x_scale = 1;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -339,8 +332,8 @@ function uibuttongroup3_widmo_y_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to uibuttongroup3_widmo_y (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-global yscale;
-yscale = 1;
+global y_scale;
+y_scale = 1;
 
 
 % --- Executes when selected object is changed in uibuttongroup2_widmo_x.
@@ -348,12 +341,12 @@ function uibuttongroup2_widmo_x_SelectionChangedFcn(hObject, eventdata, handles)
 % hObject    handle to the selected object in uibuttongroup2_widmo_x 
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global xscale;
+global x_scale;
 switch eventdata.NewValue
     case handles.radiobutton4_x_lin % liniowa
-        xscale = 1;
+        x_scale = 1;
     case handles.radiobutton5_x_log % logarytmiczna
-        xscale = 2;
+        x_scale = 2;
 end
 
 
@@ -362,26 +355,57 @@ function pushbutton4_redraw_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton4_redraw (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global xscale yscale fw yw;
+global tg xg ts xs fs x_scale y_scale;
+fs = 2000; % 2 kHz
+t = tg;
+x = xg;
+ts = t;
+xs = x;
+
+% przebieg czasowy
+axes(handles.axes1_tv);
+plot(t,x);
+zoom on;
+xlabel('Czas [s]');
+ylabel('Amplituda');
+set(gca,'fontsize',8);
+
+% widmo
+n = length(x);
+y = fft(x);
+y = y(1:n/2+1);
+y = abs(y);
+y = y/(n/2);
+df = 1/5;
+f = 0:df:fs/2;
+
+% kopia globalna
+% fw = f;
+% yw = y;
 axes(handles.axes2_widmo);
-cla(handles.axes2_widmo,'reset');
 % typ wykresu
-if xscale == 1 && yscale == 1 % lin-lin
-    plot(fw,yw);
-elseif xscale == 2 && yscale == 1 % log-lin
-    semilogx(fw,yw);
-elseif xscale == 1 && yscale == 2 % lin-log
-    semilogy(fw,yw);
+if x_scale == 1 && y_scale == 1 % lin-lin
+    plot(f,y);
+elseif x_scale == 2 && y_scale == 1 % log-lin
+    semilogx(f,y);
+elseif x_scale == 1 && y_scale == 2 % lin-log
+    semilogy(f,y);
 end
+zoom on;
+xlabel('Czêstotliwoœæ [Hz]');
+ylabel('Amplituda');
+set(gca,'fontsize',8);
+linkaxes([ handles.axes1_tv, handles.axes2_widmo ],'y');
+
 % --- Executes when selected object is changed in uibuttongroup3_widmo_y.
 function uibuttongroup3_widmo_y_SelectionChangedFcn(hObject, eventdata, handles)
 % hObject    handle to the selected object in uibuttongroup3_widmo_y 
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global yscale;
+global y_scale;
 switch eventdata.NewValue
     case handles.radiobutton6_y_lin % liniowa
-        yscale = 1;
+        y_scale = 1;
     case handles.radiobutton7_y_log % logarytmiczna
-        yscale = 2;
+        y_scale = 2;
 end
