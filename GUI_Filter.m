@@ -126,7 +126,7 @@ end
 fn = 1000;
 if isallowed
     if filter_type == 1 % dolnoprzepustowy
-        [ b, a ] = butter(5,cutoff/fn);
+        [ b, a ] = butter(15,cutoff/fn);
     else % górnoprzepustowy
         [ b, a ] = cheby2(15,45,cutoff/fn,'high');
     end
